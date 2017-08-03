@@ -1,0 +1,17 @@
+[Unit]
+Description=Beatbox Rulez
+
+[Service]
+Type=simple
+ExecStart=/home/pi/beatbox.sh
+User=pi
+Group=pi
+WorkingDirectory=/home/pi
+StandardOutput=journal+console
+StandardError=journal+console
+Restart=always
+RestartSec=3
+
+
+[Install]
+WantedBy=multi-user.target
