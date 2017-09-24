@@ -13,6 +13,7 @@ sudo stdbuf -o0 hexdump -C /dev/hidraw0 | awk -W interactive '
 /02 01 00 00 04 3f 08 36  be 00 00 00 00 00 00 00/ { print "dir5 "; play=1; file="dir5/*.mp3" ; }
 /02 01 00 00 04 8f 85 e5  e3 00 00 00 00 00 00 00/ { print "dir6 "; play=1; file="dir6/*.mp3" ; }
 /02 01 00 00 04 4f d5 15  e2 00 00 00 00 00 00 00/ { print "dir7 "; play=1; file="dir7/*.mp3" ; }
+/02 01 00 00 04 df f0 94  53 00 00 00 00 00 00 00/ { print "dir8 "; play=1; file="dir8/*.mp3" ; }
 /  02 02 00 00 0. |01 05 00 00 00 00 00 00  00 00 00 00 00 00 00 00/ { print "stop"; system("killall -q mpg321"); }
 { 
 if (play) {
