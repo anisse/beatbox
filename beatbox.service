@@ -3,7 +3,7 @@ Description=Beatbox Rulez
 
 [Service]
 Type=simple
-ExecStart=/home/pi/beatbox.sh
+ExecStart=/home/pi/beatbox
 User=pi
 Group=pi
 WorkingDirectory=/home/pi
