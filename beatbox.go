@@ -89,9 +89,9 @@ func player(c <-chan string) {
 }
 
 func main() {
-	f, err := os.Open("/dev/hidraw0")
+	f, err := os.Open("/dev/mirror")
 	if err != nil {
-		fmt.Println("Error opening hidraw0", err)
+		fmt.Println("Error", err)
 		return
 	}
 	c := make(chan string)
