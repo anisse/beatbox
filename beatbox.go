@@ -55,21 +55,24 @@ func player(c <-chan string) {
 			case strings.HasPrefix(s, STOPTAG):
 				p.stopped = time.Now()
 				stop()
+			case s == p.tag && time.Since(p.stopped) < NEXTDELAY &&
+				len(p.list) > p.index+1:
+				//next
+				p.index++
+
+				stop()
+				stop = p.play(w)
 			default:
 				list, err := filepath.Glob(s + "/*.mp3")
 				if err != nil || len(list) == 0 {
 					fmt.Println("Unknown tag/command:", s)
 					continue
 				}
-				stop()
-				if s == p.tag && time.Since(p.stopped) < NEXTDELAY &&
-					len(p.list) > p.index+1 {
-					p.index++ //next
-				} else {
-					p.index = 0 //first
-				}
+				p.index = 0 //first
 				p.tag = s
 				p.list = list
+
+				stop()
 				stop = p.play(w)
 			}
 		case err := <-w:
