@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -30,14 +29,9 @@ type playerState struct {
 
 func (p *playerState) play(w chan<- error) context.CancelFunc {
 	ctx, stop := context.WithCancel(context.Background())
-	cmd := exec.CommandContext(ctx, "mpg321", p.list[p.index])
 	fmt.Println("Now playing:", p.list[p.index])
-	err := cmd.Start()
-	if err != nil {
-		w <- err
-	}
 	go func() {
-		w <- cmd.Wait()
+		w <- playMp3(ctx, p.list[p.index])
 	}()
 	return stop
 }
@@ -63,7 +57,7 @@ func player(c <-chan string) {
 				stop()
 				stop = p.play(w)
 			default:
-				list, err := filepath.Glob(s + "/*.mp3")
+				list, err := filepath.Glob("/perm/beatbox-data/" + s + "/*.mp3")
 				if err != nil || len(list) == 0 {
 					fmt.Println("Unknown tag/command:", s)
 					continue
@@ -77,8 +71,8 @@ func player(c <-chan string) {
 			}
 		case err := <-w:
 			if err != nil {
-				if err.Error() != "signal: killed" { //this is us doing the killing
-					fmt.Println("Error running mpg321", err)
+				if err.Error() != "context canceled" { //this is us doing the cancellations
+					fmt.Println("Error playing mp3", err)
 				}
 				continue
 			}
@@ -92,7 +86,7 @@ func player(c <-chan string) {
 }
 
 func main() {
-	f, err := os.Open("/dev/mirror")
+	f, err := os.Open("/dev/hidraw0")
 	if err != nil {
 		fmt.Println("Error", err)
 		return
