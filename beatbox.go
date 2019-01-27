@@ -21,6 +21,8 @@ const (
 	STOPTAG  = "020200000"
 
 	NEXTDELAY = 5 * time.Second
+
+	DATADIR = "/perm/beatbox-data/"
 )
 
 type player struct {
@@ -31,16 +33,17 @@ type player struct {
 	spotify bool
 	session *core.Session
 	stop    context.CancelFunc
+	w       chan error
 }
 
-func (p *player) play(w chan<- error) context.CancelFunc {
+func (p *player) play() context.CancelFunc {
 	ctx, stop := context.WithCancel(context.Background())
 	fmt.Println("Now playing:", p.list[p.index])
 	go func() {
 		if p.spotify {
-			playTrack(ctx, p.session, p.list[p.index])
+			p.w <- playTrack(ctx, p.session, p.list[p.index])
 		} else {
-			w <- playMp3(ctx, p.list[p.index])
+			p.w <- playMp3(ctx, p.list[p.index])
 		}
 	}()
 	return stop
@@ -53,64 +56,73 @@ func newPlayer() (*player, error) {
 	return &player{
 		session: session,
 		stop:    func() {},
+		w:       make(chan error),
 	}, nil
 }
 
-func (p *player) player(c <-chan string) {
-	w := make(chan error)
+func (p *player) process(s string) {
+	switch {
+	case s == SHUTDOWN:
+		p.stop()
+	case strings.HasPrefix(s, STOPTAG):
+		p.stopped = time.Now()
+		p.stop()
+	case s == p.tag && time.Since(p.stopped) < NEXTDELAY &&
+		len(p.list) > p.index+1:
+		//next
+		p.index++
+
+		p.stop()
+		p.stop = p.play()
+	default:
+		list, err := filepath.Glob(DATADIR + s + "/*.mp3")
+		if err != nil || len(list) == 0 {
+			// try with spotify
+			playlist, err := ioutil.ReadFile(DATADIR + s)
+			if err == nil && len(playlist) > 0 {
+				list, err = playlistTracks(p.session, string(playlist))
+				if err != nil {
+					fmt.Println("Unknown playlist/track:",
+						err.Error(), string(playlist), s)
+					return
+				}
+				p.spotify = true
+			} else {
+				fmt.Println("Unknown tag/command:", s)
+				return
+			}
+		} else {
+			p.spotify = false
+		}
+		p.index = 0 //first
+		p.tag = s
+		p.list = list
+
+		p.stop()
+		p.stop = p.play()
+	}
+}
+func (p *player) trackFinished() {
+	//next
+	if len(p.list) > p.index+1 {
+		p.index++
+		p.stop = p.play()
+	}
+}
+
+func (p *player) run(c <-chan string) {
 	for {
 		select {
 		case s := <-c:
-			switch {
-			case s == SHUTDOWN:
-				p.stop()
-			case strings.HasPrefix(s, STOPTAG):
-				p.stopped = time.Now()
-				p.stop()
-			case s == p.tag && time.Since(p.stopped) < NEXTDELAY &&
-				len(p.list) > p.index+1:
-				//next
-				p.index++
-
-				p.stop()
-				p.stop = p.play(w)
-			default:
-				list, err := filepath.Glob("/perm/beatbox-data/" + s + "/*.mp3")
-				if err != nil || len(list) == 0 {
-					// try with spotify
-					if playlist, err := ioutil.ReadFile("/perm/beatbox-data/" + s); err == nil && len(playlist) > 0 {
-						list, err = playlistTracks(p.session, string(playlist))
-						if err != nil {
-							fmt.Println("Unknown playlist/track:", err.Error(), string(playlist), s)
-							continue
-						}
-						p.spotify = true
-					} else {
-						fmt.Println("Unknown tag/command:", s)
-						continue
-					}
-				} else {
-					p.spotify = false
-				}
-				p.index = 0 //first
-				p.tag = s
-				p.list = list
-
-				p.stop()
-				p.stop = p.play(w)
-			}
-		case err := <-w:
+			p.process(s)
+		case err := <-p.w:
 			if err != nil {
 				if err.Error() != "context canceled" { //this is us doing the cancellations
-					fmt.Println("Error playing mp3", err)
+					fmt.Println("Error playing ", err)
 				}
 				continue
 			}
-			//next
-			if len(p.list) > p.index+1 {
-				p.index++
-				p.stop = p.play(w)
-			}
+			p.trackFinished()
 		}
 	}
 }
@@ -127,7 +139,7 @@ func main() {
 		return
 	}
 	c := make(chan string)
-	go p.player(c)
+	go p.run(c)
 
 	for {
 		t := make([]byte, TAGLEN)

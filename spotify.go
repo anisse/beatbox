@@ -84,9 +84,9 @@ func playlistTracks(session *core.Session, id string) ([]string, error) {
 
 func openSession() (*core.Session, error) {
 	const (
-		usernameFile = "/perm/beatbox-data/username"
+		usernameFile = DATADIR + "username"
+		blobFile     = DATADIR + "blob.bin"
 		deviceName   = "beatbox"
-		blobFile     = "/perm/beatbox-data/blob.bin"
 	)
 
 	blobBytes, err := ioutil.ReadFile(blobFile)
