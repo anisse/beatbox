@@ -2,8 +2,12 @@ github.com/anisse/alsa v0.0.0-20190117080618-9d5ae27c4011 h1:l3ReYttCE4H51WSjsix
 github.com/anisse/alsa v0.0.0-20190117080618-9d5ae27c4011/go.mod h1:/kjT5Fn1GSvpaNUuDKjRU/+/xPtiSojj5eu5k+6vU7Y=
 github.com/anisse/librespot-golang/src/Spotify v0.0.0-20190127000001-d164560c700e79a550a h1:70aT1EJVqAGMEP5hoyDoDJ3sq8CXKtxEWPy9ipuaen4=
 github.com/anisse/librespot-golang/src/Spotify v0.0.0-20190127000001-d164560c700e79a550a/go.mod h1:uvjAGWZQNxft95Rvl1Z4rabkbI9aKLnIxhiDwjMeX/8=
+github.com/anisse/librespot-golang/src/Spotify v0.0.0-20190127211744-377997a9f2df h1:N9P7wC7o8aobAK34g4tOUc/QihHOYwvXuoPyps6AgQQ=
+github.com/anisse/librespot-golang/src/Spotify v0.0.0-20190127211744-377997a9f2df/go.mod h1:TGE9TlHls2eYKhjNEixK8tjI8Nbg93n4i1VcI81dxno=
 github.com/anisse/librespot-golang/src/librespot v0.0.0-20190127000001-d164560c700e79a550a h1:nj9fFaNfsPcIwxzPKg6q6AG1clyq0tPjsAOcQtqMQMU=
 github.com/anisse/librespot-golang/src/librespot v0.0.0-20190127000001-d164560c700e79a550a/go.mod h1:+WwcpMugckOO5WYWpLf0fw1fGfYATmPbPs8M6y7Fnys=
+github.com/anisse/librespot-golang/src/librespot v0.0.0-20190127213042-0ba7a555b6ae h1:a0BlpLv5P25LdnEs2xc/mRj0FeuItZfu1Ti5t+FlMqw=
+github.com/anisse/librespot-golang/src/librespot v0.0.0-20190127213042-0ba7a555b6ae/go.mod h1:JJyPoSa+SdUTG2YLFsXqX4cFF1C/kKbr1j/ImLw0ADQ=
 github.com/badfortrains/mdns v0.0.0-20160325001438-447166384f51 h1:b6+GdpGhuzxPETrVLwY77iq0L/BqLpcPRmaLNW+SoRY=
 github.com/badfortrains/mdns v0.0.0-20160325001438-447166384f51/go.mod h1:qHRkxMBkkpAWD2poeBYQt6O5IS4dE6w1Cr4Z8Q3feXI=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

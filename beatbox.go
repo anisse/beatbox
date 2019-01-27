@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/librespot-org/librespot-golang/src/librespot/core"
+	"github.com/anisse/librespot-golang/src/librespot/core"
 )
 
 const (

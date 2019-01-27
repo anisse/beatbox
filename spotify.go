@@ -6,10 +6,10 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/librespot-org/librespot-golang/src/Spotify"
-	"github.com/librespot-org/librespot-golang/src/librespot"
-	"github.com/librespot-org/librespot-golang/src/librespot/core"
-	"github.com/librespot-org/librespot-golang/src/librespot/utils"
+	"github.com/anisse/librespot-golang/src/Spotify"
+	"github.com/anisse/librespot-golang/src/librespot"
+	"github.com/anisse/librespot-golang/src/librespot/core"
+	"github.com/anisse/librespot-golang/src/librespot/utils"
 )
 
 func getPreferredAudioFile(track *Spotify.Track) (selectedFile *Spotify.AudioFile) {
