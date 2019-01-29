@@ -36,11 +36,25 @@ type player struct {
 	w       chan error
 }
 
+func (p *player) sessionCheck() error {
+	if p.session == nil {
+		session, err := openSession()
+		if err != nil {
+			return err
+		}
+		p.session = session
+	}
+	return nil
+}
 func (p *player) play() context.CancelFunc {
 	ctx, stop := context.WithCancel(context.Background())
 	fmt.Println("Now playing:", p.list[p.index])
 	go func() {
 		if p.spotify {
+			if err := p.sessionCheck(); err != nil {
+				p.w <- err
+				return
+			}
 			p.w <- playTrack(ctx, p.session, p.list[p.index])
 		} else {
 			p.w <- playMp3(ctx, p.list[p.index])
@@ -49,14 +63,9 @@ func (p *player) play() context.CancelFunc {
 	return stop
 }
 func newPlayer() (*player, error) {
-	session, err := openSession()
-	if err != nil {
-		return nil, err
-	}
 	return &player{
-		session: session,
-		stop:    func() {},
-		w:       make(chan error),
+		stop: func() {},
+		w:    make(chan error),
 	}, nil
 }
 
@@ -80,6 +89,11 @@ func (p *player) process(s string) {
 			// try with spotify
 			playlist, err := ioutil.ReadFile(DATADIR + s)
 			if err == nil && len(playlist) > 0 {
+				if err := p.sessionCheck(); err != nil {
+					fmt.Println("Unknown playlist/track and no spotify session:",
+						err.Error(), string(playlist), s)
+					return
+				}
 				list, err = playlistTracks(p.session, string(playlist))
 				if err != nil {
 					fmt.Println("Unknown playlist/track:",
